@@ -37,6 +37,9 @@ WEBHOOK_HOST = 'https://dangerous-seahorse-alonejustmyself-f0eebf16.koyeb.app'
 WEBHOOK_PATH = '/webhook'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
+WEBAPP_HOST = '0.0.0.0'  # Atau alamat IP server kamu
+WEBAPP_PORT = 8000
+
 @dp.message_handler(commands=['start'])
 async def handler_start(message: types.Message):
     quote_text = "halooo, gimana nih kabarnya ❔ pasti kamu mau kirim menfess ya. <blockquote>Sebelum kirim menfess jangan lupa perhatikan menfes kalian ya apakah sudah sesuai dengan ht dan tidak melanggar rulesnya</blockquote> untuk mengetahui apakah ht kalian sesuai silahkan klik 📂 /hashtag"
