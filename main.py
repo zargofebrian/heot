@@ -58,7 +58,6 @@ async def send_all_hashtags(message: types.Message):
 
 boti = Bot(token="7026729109:AAGsiEhZvi-sETZjv2u9Q1R2rF08SXueot4")
 
-forwarded_message_mapping = {}
 in_progress = {}
 last_message_time = {}
 
@@ -777,30 +776,8 @@ async def cancel_send_to_channel(callback_query: types.CallbackQuery, state: FSM
     await callback_query.answer()
 
 @dp.message_handler(lambda message: message.chat.type == 'private', content_types=types.ContentType.ANY)
-async def forward_any_to_admin(message: types.Message):
-    forwarded_msg = await message.forward(-1002087824662)
-    forwarded_message_mapping[forwarded_msg.message_id] = message.from_user.id
-
-@dp.message_handler(lambda message: message.chat.type in ['group', 'supergroup'] and message.reply_to_message, content_types=types.ContentType.ANY)
-async def reply_to_user(message: types.Message):
-    original_message_id = message.reply_to_message.message_id
-    original_user_id = forwarded_message_mapping.get(original_message_id)
-    if original_user_id:
-        if message.content_type == 'text':
-            await bot.send_message(original_user_id, message.text)
-        elif message.content_type == 'photo':
-            await bot.send_photo(original_user_id, photo=message.photo[-1].file_id, caption=message.caption)
-        elif message.content_type == 'audio':
-            await bot.send_audio(original_user_id, audio=message.audio.file_id, caption=message.caption)
-        elif message.content_type == 'video':
-            await bot.send_video(original_user_id, video=message.video.file_id, caption=message.caption)
-        elif message.content_type == 'document':
-            await bot.send_document(original_user_id, document=message.document.file_id, caption=message.caption)
-        elif message.content_type == 'sticker':
-            await bot.send_sticker(original_user_id, sticker=message.sticker.file_id)
-        else:
-            await bot.send_message(original_user_id, "Received a message type that I can't handle!")
-        logging.info(f"Reply sent to user: {original_user_id} with content type: {message.content_type}")
+async def private_chat_handler(message: types.Message):
+    await message.reply("hai, silahkan kirim menggunakan hashtag yang ada, sebelum mengirim kamu bisa baca rules dulu yaa")
         
 async def on_startup(dp):
     await bot.set_webhook(WEBHOOK_URL)
