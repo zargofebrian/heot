@@ -22,14 +22,20 @@ from aiogram import Bot, executor
 from aiogram import Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import Message
+from aiogram.contrib.middlewares.logging import LoggingMiddleware
+from aiogram.contrib.middlewares.environment import EnvironmentMiddleware
+from aiogram.utils.executor import start_webhook
 
-PROXY_URL = 'http://proxy.server:3128'
 
 bot = Bot(token="6945981247:AAHuPO0UgNv2z0j3HyW5EpDzFQBurLBFw-w")
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
 CHANNEL_ID = -1002079102928
+
+WEBHOOK_HOST = 'https://dangerous-seahorse-alonejustmyself-f0eebf16.koyeb.app'
+WEBHOOK_PATH = '/webhook'
+WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
 @dp.message_handler(commands=['start'])
 async def handler_start(message: types.Message):
@@ -382,7 +388,8 @@ async def cmd_onbot(message: types.Message):
     bot_status['status'] = 'on'
     bot_status['message'] = None
     await message.reply("Bot telah dihidupkan kembali.")
-
+    
+dp.middleware.setup(LoggingMiddleware())
 dp.middleware.setup(CombinedMiddleware())
 
 @dp.message_handler(commands=['offbot'])
@@ -792,5 +799,19 @@ async def reply_to_user(message: types.Message):
             await bot.send_message(original_user_id, "Received a message type that I can't handle!")
         logging.info(f"Reply sent to user: {original_user_id} with content type: {message.content_type}")
         
+async def on_startup(dp):
+    await bot.set_webhook(WEBHOOK_URL)
+
+async def on_shutdown(dp):
+    await bot.delete_webhook()
+
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=False)
+    from aiogram import executor
+    start_webhook(
+        dispatcher=dp,
+        webhook_path=WEBHOOK_PATH,
+        on_startup=on_startup,
+        on_shutdown=on_shutdown,
+        host=WEBAPP_HOST,
+        port=WEBAPP_PORT,
+    )
